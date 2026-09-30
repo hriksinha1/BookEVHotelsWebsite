@@ -68,11 +68,11 @@ export default function HomePage() {
             alt="Electric car ready for an Indian road trip"
             fallback="hero"
             className="absolute inset-0 h-full w-full"
-            imageClassName="opacity-70"
+            imageClassName="object-center"
             loading="eager"
             fetchPriority="high"
           />
-          <div className="absolute inset-0 bg-gradient-to-b from-neutral-950/50 via-neutral-950/40 to-neutral-950/90" />
+          <div className="absolute inset-0 bg-gradient-to-b from-neutral-950/35 via-neutral-950/25 to-neutral-950/75" />
           <div className="relative z-10 mx-auto w-full max-w-7xl px-4 pb-16 pt-28 sm:px-6 lg:pb-20">
             <div className="mx-auto mb-10 max-w-3xl text-center">
               <p className="mb-4 text-xs font-semibold uppercase tracking-widest text-brand-300">

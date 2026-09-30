@@ -4,6 +4,8 @@ import Header from "../components/Header";
 import Footer from "../components/Footer";
 import { Heading } from "../components/ui";
 import GuideArticlePage from "./GuideArticlePage";
+import SafeImage from "../components/SafeImage";
+import { imageRegistry } from "../data/images";
 
 const articles: Record<string, { category: string; title: string; intro: string; points: string[]; destination?: string }> = {
   "understanding-ev-charger-speeds": {
@@ -82,6 +84,14 @@ export default function GuideArticleRouterPage() {
           <p className="text-sm font-semibold uppercase tracking-wide text-brand-700">{article.category}</p>
           <Heading level={1} className="mt-3 text-4xl font-bold leading-tight tracking-tight text-neutral-950">{article.title}</Heading>
           <p className="mt-6 text-lg leading-relaxed text-neutral-700">{article.intro}</p>
+          <SafeImage
+            src={imageRegistry.guides[slug]}
+            alt={`${article.title} guide`}
+            fallback="guide"
+            className="mt-8 aspect-video w-full rounded-2xl"
+            loading="eager"
+            fetchPriority="high"
+          />
           <div className="mt-10 rounded-2xl border border-brand-200 bg-brand-50 p-6">
             <Heading level={2} className="text-lg font-semibold text-brand-800">What matters</Heading>
             <ul className="mt-4 space-y-3">

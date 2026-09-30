@@ -74,7 +74,7 @@ export default function GuideArticlePage() {
                 </ul>
               </div>
 
-              <h2 className="text-[28px] font-bold text-neutral-950 leading-[36px] mb-5">1. A checkbox isn't verification</h2>
+              <h2 id="verification" className="scroll-mt-24 text-[28px] font-bold text-neutral-950 leading-[36px] mb-5">1. A checkbox isn't verification</h2>
               <p className="text-[17px] text-neutral-700 leading-[30px] mb-6">
                 Mainstream hotel booking platforms let any hotel tick "EV charging available" as an amenity — no confirmation required. The checkbox might mean a single 15A socket in the basement car park, a charger that hasn't worked in months, or an actual 22 kW AC charger in a dedicated bay. The checkbox doesn't tell you.
               </p>
@@ -82,7 +82,7 @@ export default function GuideArticlePage() {
                 Book EV Hotels only lists hotels where we've confirmed a working EV charger by phone. But even when reading any listing — ours or elsewhere — here's what to actually check.
               </p>
 
-              <h2 className="text-[28px] font-bold text-neutral-950 leading-[36px] mb-5">2. Connector type</h2>
+              <h2 id="connector" className="scroll-mt-24 text-[28px] font-bold text-neutral-950 leading-[36px] mb-5">2. Connector type</h2>
               <p className="text-[17px] text-neutral-700 leading-[30px] mb-6">
                 In India today, the two main connector types for passenger EVs are:
               </p>
@@ -98,7 +98,7 @@ export default function GuideArticlePage() {
                 ))}
               </ul>
 
-              <h2 className="text-[28px] font-bold text-neutral-950 leading-[36px] mb-5">3. Charger power (kW)</h2>
+              <h2 id="power" className="scroll-mt-24 text-[28px] font-bold text-neutral-950 leading-[36px] mb-5">3. Charger power (kW)</h2>
               <p className="text-[17px] text-neutral-700 leading-[30px] mb-6">
                 The power rating tells you how fast the charger can supply electricity — not necessarily how fast your car will charge.
               </p>
@@ -118,12 +118,12 @@ export default function GuideArticlePage() {
                 ))}
               </div>
 
-              <h2 className="text-[28px] font-bold text-neutral-950 leading-[36px] mb-5 mt-10">4. Public or Guest Only</h2>
+              <h2 id="access" className="scroll-mt-24 text-[28px] font-bold text-neutral-950 leading-[36px] mb-5 mt-10">4. Public or Guest Only</h2>
               <p className="text-[17px] text-neutral-700 leading-[30px] mb-8">
                 This is critical. Public chargers are available to non-guests as well as hotel guests. Guest Only chargers are reserved for staying guests — you cannot use them without a room booking. Know which type you're booking around.
               </p>
 
-              <h2 className="text-[28px] font-bold text-neutral-950 leading-[36px] mb-5">5. Confirm on the day</h2>
+              <h2 id="confirm" className="scroll-mt-24 text-[28px] font-bold text-neutral-950 leading-[36px] mb-5">5. Confirm on the day</h2>
               <p className="text-[17px] text-neutral-700 leading-[30px] mb-8">
                 Even a verified listing is a point-in-time confirmation, not a real-time guarantee. Chargers can occasionally be out of service — equipment failures happen. If charging is critical to your journey, call the hotel on your travel day to confirm the charger is available and working.
               </p>
@@ -145,14 +145,14 @@ export default function GuideArticlePage() {
                   <h3 className="text-[13px] font-semibold text-neutral-500 uppercase tracking-wider mb-4">In this guide</h3>
                   <ul className="space-y-2">
                     {[
-                      "1. A checkbox isn't verification",
-                      "2. Connector type",
-                      "3. Charger power (kW)",
-                      "4. Public or Guest Only",
-                      "5. Confirm on the day",
+                      { label: "1. A checkbox isn't verification", href: "#verification" },
+                      { label: "2. Connector type", href: "#connector" },
+                      { label: "3. Charger power (kW)", href: "#power" },
+                      { label: "4. Public or Guest Only", href: "#access" },
+                      { label: "5. Confirm on the day", href: "#confirm" },
                     ].map(item => (
-                      <li key={item}>
-                        <a href="#" className="text-[13px] text-neutral-600 hover:text-brand-700 leading-[20px] transition-colors">{item}</a>
+                      <li key={item.href}>
+                        <a href={item.href} className="text-[13px] text-neutral-600 hover:text-brand-700 leading-[20px] transition-colors">{item.label}</a>
                       </li>
                     ))}
                   </ul>

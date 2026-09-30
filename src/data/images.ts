@@ -33,4 +33,12 @@ export const imageRegistry = {
     Manali: imageFromPhotoId("photo-1506905925346-21bda4d32df4"),
     Kabini: imageFromPhotoId("photo-1509316785289-025f5b846b35"),
   } as Record<string, string>,
+  guides: {
+    "what-to-check-before-booking-ev-hotel": imageFromPhotoId("photo-1593941707874-ef25b8b4a92b"),
+    "understanding-ev-charger-speeds": imageFromPhotoId("photo-1558618666-fcd25c85cd64"),
+    "delhi-jaipur-udaipur-ev-road-trip": imageFromPhotoId("photo-1477587458883-47145ed31fd0"),
+    "bengaluru-coorg-ev-road-trip": imageFromPhotoId("photo-1606298855672-3efb63017be8"),
+    "public-vs-guest-only-charging": imageFromPhotoId("photo-1593941707874-ef25b8b4a92b"),
+    "best-ev-hotels-rajasthan": imageFromPhotoId("photo-1615836245337-f5b9b2303f10"),
+  } as Record<string, string>,
 };

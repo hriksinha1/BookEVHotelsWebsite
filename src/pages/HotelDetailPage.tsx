@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
 import {
   Star, MapPin, CheckCircle2, ExternalLink, Bookmark,
@@ -16,6 +16,7 @@ import { useSearchState } from "../hooks/useSearchState";
 import SafeImage from "../components/SafeImage";
 import { imageFromPhotoId } from "../data/images";
 import { Button } from "../components/ui";
+import { useSavedHotels } from "../hooks/useSavedHotels";
 
 function ChargerRow({ charger }: { charger: Charger }) {
   return (
@@ -107,11 +108,23 @@ export default function HotelDetailPage() {
   const navigate = useNavigate();
   const hotel = getHotelBySlug(slug || "");
   const [selectedRoom, setSelectedRoom] = useState<string | null>(null);
-  const [saved, setSaved] = useState(false);
+  const { savedIds, toggleSaved } = useSavedHotels();
   const [activePhoto, setActivePhoto] = useState(0);
   const [galleryOpen, setGalleryOpen] = useState(false);
   const [showVerification, setShowVerification] = useState(false);
   const [searchState] = useSearchState(`${hotel?.city || ""}, ${hotel?.state || ""}`);
+  const saved = hotel ? savedIds.includes(hotel.id) : false;
+
+  useEffect(() => {
+    if (!galleryOpen) return;
+    const closeOnEscape = (event: KeyboardEvent) => {
+      if (event.key === "Escape") setGalleryOpen(false);
+      if (event.key === "ArrowLeft") setActivePhoto(current => (current - 1 + (hotel?.images.length || 1)) % (hotel?.images.length || 1));
+      if (event.key === "ArrowRight") setActivePhoto(current => (current + 1) % (hotel?.images.length || 1));
+    };
+    window.addEventListener("keydown", closeOnEscape);
+    return () => window.removeEventListener("keydown", closeOnEscape);
+  }, [galleryOpen, hotel?.images.length]);
 
   if (!hotel) {
     return (
@@ -139,6 +152,12 @@ export default function HotelDetailPage() {
       ...(searchState.checkOut ? { checkout: searchState.checkOut } : {}),
     });
     navigate(`/booking/${hotel.slug}/${nights > 0 ? "guest" : "rooms"}?${bookingParams.toString()}`);
+  };
+
+  const handleShare = async () => {
+    const shareData = { title: hotel.name, text: `${hotel.name} — verified EV charging details`, url: window.location.href };
+    if (navigator.share) await navigator.share(shareData);
+    else await navigator.clipboard.writeText(window.location.href);
   };
 
   return (
@@ -182,30 +201,39 @@ export default function HotelDetailPage() {
               </div>
             </div>
             <div className="flex items-center gap-2">
-              <button
-                onClick={() => setSaved(!saved)}
+              <Button
+                onClick={() => toggleSaved(hotel.id)}
                 className={`flex items-center gap-2 px-4 py-2 rounded-xl border text-[14px] font-semibold transition-colors ${saved ? "bg-brand-700 text-white border-brand-700" : "border-neutral-300 text-neutral-700 hover:bg-neutral-100"}`}
               >
                 <Bookmark size={15} className={saved ? "fill-white" : ""} />
                 {saved ? "Saved" : "Save"}
-              </button>
-              <button className="flex items-center gap-2 px-4 py-2 rounded-xl border border-neutral-300 text-neutral-700 text-[14px] font-semibold hover:bg-neutral-100 transition-colors">
+              </Button>
+              <Button onClick={handleShare} className="flex items-center gap-2 px-4 py-2 rounded-xl border border-neutral-300 text-neutral-700 text-[14px] font-semibold hover:bg-neutral-100 transition-colors">
                 <Share2 size={15} />
                 Share
-              </button>
+              </Button>
             </div>
           </div>
 
           {/* Photo gallery */}
-          <div className="relative mb-8 grid aspect-[4/3] grid-cols-4 gap-2 overflow-hidden rounded-2xl sm:aspect-[16/7]">
-            <Button onClick={() => { setActivePhoto(0); setGalleryOpen(true); }} className="col-span-4 row-span-2 overflow-hidden bg-neutral-200 sm:col-span-2" aria-label={`Open photos for ${hotel.name}`}>
-              <SafeImage src={imageFromPhotoId(hotel.images[0])} alt={`${hotel.name} main view`} fallback="hotel" className="h-full w-full" imageClassName="transition-transform duration-500 hover:scale-105" loading="eager" fetchPriority="high" />
-            </Button>
-            {hotel.images.slice(1, 5).map((img, i) => (
-              <Button key={img} onClick={() => { setActivePhoto(i + 1); setGalleryOpen(true); }} className="hidden overflow-hidden bg-neutral-200 sm:block" aria-label={`Open photo ${i + 2} of ${hotel.name}`}>
-                <SafeImage src={imageFromPhotoId(img)} alt={`${hotel.name} view ${i + 2}`} fallback="hotel" className="h-full w-full" imageClassName="transition-transform duration-500 hover:scale-105" />
+          <div className="relative mb-8">
+            <div className="flex snap-x snap-mandatory overflow-x-auto rounded-2xl sm:hidden">
+              {hotel.images.map((img, i) => (
+                <Button key={img} onClick={() => { setActivePhoto(i); setGalleryOpen(true); }} className="w-full shrink-0 snap-center overflow-hidden bg-neutral-200" aria-label={`Open photo ${i + 1} of ${hotel.name}`}>
+                  <SafeImage src={imageFromPhotoId(img)} alt={`${hotel.name} view ${i + 1}`} fallback="hotel" className="aspect-[4/3] w-full" loading={i === 0 ? "eager" : "lazy"} fetchPriority={i === 0 ? "high" : "auto"} />
+                </Button>
+              ))}
+            </div>
+            <div className="hidden aspect-[16/7] grid-cols-4 gap-2 overflow-hidden rounded-2xl sm:grid">
+              <Button onClick={() => { setActivePhoto(0); setGalleryOpen(true); }} className="col-span-2 row-span-2 overflow-hidden bg-neutral-200" aria-label={`Open photos for ${hotel.name}`}>
+                <SafeImage src={imageFromPhotoId(hotel.images[0])} alt={`${hotel.name} main view`} fallback="hotel" className="h-full w-full" imageClassName="transition-transform duration-500 hover:scale-105" loading="eager" fetchPriority="high" />
               </Button>
-            ))}
+              {hotel.images.slice(1, 5).map((img, i) => (
+                <Button key={img} onClick={() => { setActivePhoto(i + 1); setGalleryOpen(true); }} className="overflow-hidden bg-neutral-200" aria-label={`Open photo ${i + 2} of ${hotel.name}`}>
+                  <SafeImage src={imageFromPhotoId(img)} alt={`${hotel.name} view ${i + 2}`} fallback="hotel" className="h-full w-full" imageClassName="transition-transform duration-500 hover:scale-105" />
+                </Button>
+              ))}
+            </div>
             <Button onClick={() => setGalleryOpen(true)} className="absolute bottom-4 right-4 flex min-h-11 items-center gap-2 rounded-xl bg-white px-4 text-sm font-semibold text-neutral-950 shadow-lg">
               <Images size={16} /> View all photos
             </Button>

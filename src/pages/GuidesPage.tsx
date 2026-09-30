@@ -4,7 +4,7 @@ import { Clock, ChevronRight } from "lucide-react";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 import SafeImage from "../components/SafeImage";
-import { imageFromPhotoId } from "../data/images";
+import { imageRegistry } from "../data/images";
 import { Button } from "../components/ui";
 
 const guides = [
@@ -15,7 +15,6 @@ const guides = [
     description: "A charger checkbox on a booking portal isn't proof. Here's exactly what to look for — and what questions to ask — before you reserve a stay.",
     readTime: "8 min read",
     updated: "September 2025",
-    image: "photo-1593941707874-ef25b8b4a92b",
   },
   {
     slug: "understanding-ev-charger-speeds",
@@ -24,7 +23,6 @@ const guides = [
     description: "Not all chargers are equal. Learn what the numbers actually mean for your overnight stay and your car's onboard charger.",
     readTime: "6 min read",
     updated: "August 2025",
-    image: "photo-1558618666-fcd25c85cd64",
   },
   {
     slug: "delhi-jaipur-udaipur-ev-road-trip",
@@ -33,7 +31,6 @@ const guides = [
     description: "India's golden triangle is one of the most popular EV road-trip routes. Here's how to plan charging, where to stay, and what to expect.",
     readTime: "12 min read",
     updated: "July 2025",
-    image: "photo-1477587458883-47145ed31fd0",
   },
   {
     slug: "bengaluru-coorg-ev-road-trip",
@@ -42,7 +39,6 @@ const guides = [
     description: "A 270 km drive through Karnataka's coffee hills with verified EV charging at the destination. What to know before you go.",
     readTime: "10 min read",
     updated: "June 2025",
-    image: "photo-1606298855672-3efb63017be8",
   },
   {
     slug: "public-vs-guest-only-charging",
@@ -51,7 +47,6 @@ const guides = [
     description: "These two access types determine whether you can use a hotel's charger without staying there. Here's what each means and why it matters.",
     readTime: "5 min read",
     updated: "May 2025",
-    image: "photo-1593941707874-ef25b8b4a92b",
   },
   {
     slug: "best-ev-hotels-rajasthan",
@@ -60,7 +55,6 @@ const guides = [
     description: "Rajasthan has some of India's most spectacular heritage hotels — and more are getting verified EV chargers every month.",
     readTime: "9 min read",
     updated: "April 2025",
-    image: "photo-1477587458883-47145ed31fd0",
   },
 ];
 
@@ -113,7 +107,7 @@ export default function GuidesPage() {
                 <Link key={guide.slug} to={`/guides/${guide.slug}`} className="bg-white rounded-2xl border border-neutral-200 overflow-hidden hover:shadow-lg transition-shadow group">
                   <div className="aspect-video bg-neutral-200 overflow-hidden">
                     <SafeImage
-                      src={imageFromPhotoId(guide.image)}
+                      src={imageRegistry.guides[guide.slug]}
                       alt={guide.title}
                       fallback="guide"
                       className="h-full w-full"

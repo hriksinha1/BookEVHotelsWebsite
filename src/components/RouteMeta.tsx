@@ -55,6 +55,6 @@ export default function RouteMeta() {
     title = titles[pathname] ?? title;
   }
 
-  usePageMeta(title, description);
+  usePageMeta(title, description, pathname);
   return null;
 }
