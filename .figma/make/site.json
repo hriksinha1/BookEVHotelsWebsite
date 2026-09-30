@@ -1,0 +1,10 @@
+{
+  "description": "Discover and book verified EV-friendly hotels across India, ensuring reliable charging options for electric vehicle travelers.",
+  "robots": {
+    "index": false
+  },
+  "accessibility": {
+    "addBypassLinks": false,
+    "ignoreReducedMotion": false
+  }
+}
