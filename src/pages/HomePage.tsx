@@ -63,15 +63,18 @@ export default function HomePage() {
       <Header transparent />
       <main>
         <section className="relative flex min-h-screen items-center overflow-hidden bg-neutral-950">
-          <SafeImage
-            src={imageRegistry.hero}
-            alt="Electric car ready for an Indian road trip"
-            fallback="hero"
-            className="absolute inset-0 h-full w-full"
-            imageClassName="object-center"
-            loading="eager"
-            fetchPriority="high"
-          />
+          <div className="absolute inset-0">
+            <SafeImage
+              src={imageRegistry.hero}
+              alt="Electric car ready for an Indian road trip"
+              fallback="hero"
+              className="h-full w-full"
+              imageClassName="object-center"
+              loading="eager"
+              fetchPriority="high"
+              sizes="100vw"
+            />
+          </div>
           <div className="absolute inset-0 bg-gradient-to-b from-neutral-950/35 via-neutral-950/25 to-neutral-950/75" />
           <div className="relative z-10 mx-auto w-full max-w-7xl px-4 pb-16 pt-28 sm:px-6 lg:pb-20">
             <div className="mx-auto mb-10 max-w-3xl text-center">
