@@ -308,6 +308,19 @@ export function getHotelsByState(state: string): Hotel[] {
   return hotels.filter(h => h.state.toLowerCase() === state.toLowerCase());
 }
 
+export function getAvailableRooms(hotel: Hotel): RoomType[] {
+  return hotel.roomTypes.filter(room => room.availability !== "sold-out");
+}
+
+export function getLowestAvailablePrice(hotel: Hotel): number | null {
+  const prices = getAvailableRooms(hotel).map(room => room.pricePerNight);
+  return prices.length ? Math.min(...prices) : null;
+}
+
+export function hasFreeCancellation(hotel: Hotel): boolean {
+  return getAvailableRooms(hotel).some(room => room.cancellation === "Free");
+}
+
 export function formatPrice(amount: number): string {
   return `₹${amount.toLocaleString("en-IN")}`;
 }

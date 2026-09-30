@@ -3,11 +3,13 @@ import { Star, Bookmark, MapPin } from "lucide-react";
 import { useState } from "react";
 import { VerifiedBadge, AccessChip, ChargerSpecLine } from "./EVBadge";
 import type { Hotel } from "../data/hotels";
-import { formatPrice, getPrimaryCharger } from "../data/hotels";
+import { formatPrice, getLowestAvailablePrice, getPrimaryCharger, hasFreeCancellation } from "../data/hotels";
+import { Button, Heading } from "./ui";
 
 export default function HotelCard({ hotel, compact = false }: { hotel: Hotel; compact?: boolean }) {
   const [saved, setSaved] = useState(false);
   const primaryCharger = getPrimaryCharger(hotel);
+  const availablePrice = getLowestAvailablePrice(hotel);
   const img = hotel.images[0];
   const imgUrl = `https://images.unsplash.com/${img}?w=600&h=400&fit=crop&auto=format`;
 
@@ -19,16 +21,19 @@ export default function HotelCard({ hotel, compact = false }: { hotel: Hotel; co
         </div>
         <div className="flex-1 min-w-0">
           <div className="flex items-start justify-between gap-2">
-            <h3 className="text-[14px] font-semibold text-neutral-950 line-clamp-2 leading-[20px]">{hotel.name}</h3>
+            <Heading level={3} className="line-clamp-2 text-sm font-semibold leading-5 text-neutral-950">{hotel.name}</Heading>
           </div>
-          <p className="text-[12px] text-neutral-600 mt-0.5">{hotel.city}, {hotel.state}</p>
+          <p className="mt-0.5 text-xs text-neutral-600">{hotel.city}, {hotel.state}</p>
           {primaryCharger && (
             <div className="mt-1.5 flex items-center gap-1.5 flex-wrap">
               <VerifiedBadge compact />
               <AccessChip access={primaryCharger.access} compact />
             </div>
           )}
-          <p className="text-[14px] font-bold text-neutral-950 mt-1 tabular-nums">{formatPrice(hotel.priceFrom)}<span className="text-[11px] font-normal text-neutral-600"> / night</span></p>
+          <p className="mt-1 text-sm font-bold text-neutral-950 tabular-nums">
+            {availablePrice === null ? "Sold out" : formatPrice(availablePrice)}
+            {availablePrice !== null && <span className="text-xs font-normal text-neutral-600"> / night</span>}
+          </p>
         </div>
       </Link>
     );
@@ -44,15 +49,15 @@ export default function HotelCard({ hotel, compact = false }: { hotel: Hotel; co
           className="w-full h-full object-cover"
           loading="lazy"
         />
-        <button
+        <Button
           onClick={e => { e.preventDefault(); setSaved(!saved); }}
           className={`absolute top-3 right-3 w-9 h-9 rounded-full flex items-center justify-center transition-colors ${saved ? "bg-brand-700 text-white" : "bg-white/90 text-neutral-600 hover:bg-white"}`}
           aria-label={saved ? "Remove from saved" : "Save hotel"}
         >
           <Bookmark size={16} className={saved ? "fill-white" : ""} />
-        </button>
+        </Button>
         {hotel.bookingType === "partner" && (
-          <span className="absolute bottom-3 left-3 bg-white/90 text-neutral-700 text-[11px] font-semibold px-2 py-1 rounded-full">
+          <span className="absolute bottom-3 left-3 rounded-full bg-white/90 px-2 py-1 text-xs font-semibold text-neutral-700">
             Via Agoda
           </span>
         )}
@@ -64,7 +69,7 @@ export default function HotelCard({ hotel, compact = false }: { hotel: Hotel; co
         {hotel.verified && <VerifiedBadge />}
 
         {/* Hotel name */}
-        <h3 className="mt-2.5 text-[18px] font-semibold leading-[26px] text-neutral-950 line-clamp-2">{hotel.name}</h3>
+        <Heading level={3} className="mt-2.5 line-clamp-2 text-lg font-semibold leading-7 text-neutral-950">{hotel.name}</Heading>
 
         {/* Stars + rating */}
         <div className="flex items-center gap-2 mt-1.5">
@@ -74,17 +79,17 @@ export default function HotelCard({ hotel, compact = false }: { hotel: Hotel; co
             ))}
           </div>
           {hotel.rating && (
-            <span className="text-[13px] font-semibold text-neutral-800 tabular-nums">{hotel.rating}</span>
+            <span className="text-sm font-semibold text-neutral-800 tabular-nums">{hotel.rating}</span>
           )}
           {hotel.reviewCount && (
-            <span className="text-[13px] text-neutral-500">({hotel.reviewCount})</span>
+            <span className="text-sm text-neutral-500">({hotel.reviewCount})</span>
           )}
         </div>
 
         {/* Location */}
         <div className="flex items-center gap-1 mt-1.5 text-neutral-600">
           <MapPin size={13} />
-          <span className="text-[13px]">{hotel.city}, {hotel.state}</span>
+          <span className="text-sm">{hotel.city}, {hotel.state}</span>
         </div>
 
         {/* EV info */}
@@ -93,7 +98,7 @@ export default function HotelCard({ hotel, compact = false }: { hotel: Hotel; co
             <div className="flex items-center gap-2 flex-wrap">
               <AccessChip access={primaryCharger.access} />
               {hotel.chargers.length > 1 && (
-                <span className="text-[12px] text-neutral-500">+{hotel.chargers.length - 1} more</span>
+                <span className="text-xs text-neutral-500">+{hotel.chargers.length - 1} more</span>
               )}
             </div>
             <ChargerSpecLine
@@ -111,13 +116,17 @@ export default function HotelCard({ hotel, compact = false }: { hotel: Hotel; co
         {/* Price + CTA */}
         <div className="mt-4 flex items-end justify-between gap-3">
           <div>
-            <span className="text-[22px] font-bold text-neutral-950 tabular-nums">{formatPrice(hotel.priceFrom)}</span>
-            <span className="text-[13px] text-neutral-500 ml-1">/ night</span>
-            <p className="text-[12px] text-success-text mt-0.5">Free cancellation available</p>
+            <span className="text-2xl font-bold text-neutral-950 tabular-nums">
+              {availablePrice === null ? "Sold out" : formatPrice(availablePrice)}
+            </span>
+            {availablePrice !== null && <span className="ml-1 text-sm text-neutral-500">/ night</span>}
+            <p className={`mt-0.5 text-xs ${hasFreeCancellation(hotel) ? "text-success-text" : "text-neutral-500"}`}>
+              {hasFreeCancellation(hotel) ? "Free cancellation available" : "Non-refundable rates"}
+            </p>
           </div>
           <Link
             to={`/hotels/${hotel.slug}`}
-            className="shrink-0 bg-brand-700 hover:bg-brand-800 text-white px-4 py-2.5 rounded-xl text-[14px] font-semibold transition-colors whitespace-nowrap"
+            className="shrink-0 whitespace-nowrap rounded-xl bg-brand-700 px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-brand-800"
           >
             View hotel
           </Link>

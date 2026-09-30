@@ -1,15 +1,19 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { Search, Menu, X, Bookmark, User, ChevronDown, Zap } from "lucide-react";
+import { Button } from "./ui";
 
 export default function Header({ transparent = false }: { transparent?: boolean }) {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const location = useLocation();
 
-  if (typeof window !== "undefined") {
-    window.addEventListener("scroll", () => setScrolled(window.scrollY > 40), { passive: true });
-  }
+  useEffect(() => {
+    const handleScroll = () => setScrolled(window.scrollY > 40);
+    handleScroll();
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
 
   const isActive = (path: string) => location.pathname === path;
   const bg = transparent && !scrolled && !mobileOpen ? "bg-transparent" : "bg-white border-b border-neutral-200";
@@ -23,7 +27,7 @@ export default function Header({ transparent = false }: { transparent?: boolean 
             <div className="w-8 h-8 bg-brand-700 rounded-lg flex items-center justify-center">
               <Zap size={16} className="text-white fill-white" />
             </div>
-            <span className={`font-bold text-[15px] leading-tight tracking-tight ${transparent && !scrolled ? "text-white" : "text-neutral-950"}`}>
+            <span className={`text-sm font-bold leading-tight tracking-tight ${transparent && !scrolled ? "text-white" : "text-neutral-950"}`}>
               Book EV Hotels
             </span>
           </Link>
@@ -40,7 +44,7 @@ export default function Header({ transparent = false }: { transparent?: boolean 
               <Link
                 key={link.to}
                 to={link.to}
-                className={`px-3 py-2 rounded-lg text-[14px] font-medium transition-colors ${
+                className={`rounded-lg px-3 py-2 text-sm font-medium transition-colors ${
                   isActive(link.to)
                     ? "text-brand-700 bg-brand-50"
                     : transparent && !scrolled
@@ -57,7 +61,7 @@ export default function Header({ transparent = false }: { transparent?: boolean 
           <div className="hidden lg:flex items-center gap-2">
             <Link
               to="/list-your-hotel"
-              className={`px-4 py-2 rounded-lg text-[14px] font-semibold border transition-colors ${
+              className={`rounded-lg border px-4 py-2 text-sm font-semibold transition-colors ${
                 transparent && !scrolled
                   ? "border-white/40 text-white hover:bg-white/10"
                   : "border-brand-700 text-brand-700 hover:bg-brand-50"
@@ -85,7 +89,7 @@ export default function Header({ transparent = false }: { transparent?: boolean 
             </Link>
             <Link
               to="/search"
-              className="flex items-center gap-2 bg-brand-700 hover:bg-brand-800 text-white px-4 py-2 rounded-lg text-[14px] font-semibold transition-colors"
+              className="flex items-center gap-2 rounded-lg bg-brand-700 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-brand-800"
             >
               <Search size={14} />
               Search Hotels
@@ -97,13 +101,13 @@ export default function Header({ transparent = false }: { transparent?: boolean 
             <Link to="/search" className={transparent && !scrolled ? "text-white" : "text-neutral-600"} aria-label="Search">
               <Search size={20} />
             </Link>
-            <button
+            <Button
               onClick={() => setMobileOpen(!mobileOpen)}
               className={transparent && !scrolled ? "text-white" : "text-neutral-600"}
               aria-label={mobileOpen ? "Close menu" : "Open menu"}
             >
               {mobileOpen ? <X size={20} /> : <Menu size={20} />}
-            </button>
+            </Button>
           </div>
         </div>
       </div>
@@ -123,7 +127,7 @@ export default function Header({ transparent = false }: { transparent?: boolean 
               key={link.to}
               to={link.to}
               onClick={() => setMobileOpen(false)}
-              className="block px-4 py-3 rounded-lg text-[15px] font-medium text-neutral-800 hover:bg-neutral-100"
+              className="block rounded-lg px-4 py-3 text-base font-medium text-neutral-800 hover:bg-neutral-100"
             >
               {link.label}
             </Link>
@@ -132,14 +136,14 @@ export default function Header({ transparent = false }: { transparent?: boolean 
             <Link
               to="/list-your-hotel"
               onClick={() => setMobileOpen(false)}
-              className="block px-4 py-3 rounded-lg text-[15px] font-semibold text-brand-700 border border-brand-700"
+              className="block rounded-lg border border-brand-700 px-4 py-3 text-base font-semibold text-brand-700"
             >
               List Your Hotel
             </Link>
             <Link
               to="/login"
               onClick={() => setMobileOpen(false)}
-              className="block px-4 py-3 rounded-lg text-[15px] font-medium text-neutral-700 hover:bg-neutral-100"
+              className="block rounded-lg px-4 py-3 text-base font-medium text-neutral-700 hover:bg-neutral-100"
             >
               Sign in
             </Link>
