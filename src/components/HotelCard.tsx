@@ -5,6 +5,8 @@ import type { Hotel } from "../data/hotels";
 import { formatPrice, getLowestAvailablePrice, getPrimaryCharger, hasFreeCancellation } from "../data/hotels";
 import { Button, Heading } from "./ui";
 import { useSavedHotels } from "../hooks/useSavedHotels";
+import SafeImage from "./SafeImage";
+import { imageFromPhotoId } from "../data/images";
 
 export default function HotelCard({ hotel, compact = false }: { hotel: Hotel; compact?: boolean }) {
   const { savedIds, toggleSaved } = useSavedHotels();
@@ -12,13 +14,13 @@ export default function HotelCard({ hotel, compact = false }: { hotel: Hotel; co
   const primaryCharger = getPrimaryCharger(hotel);
   const availablePrice = getLowestAvailablePrice(hotel);
   const img = hotel.images[0];
-  const imgUrl = `https://images.unsplash.com/${img}?w=600&h=400&fit=crop&auto=format`;
+  const imgUrl = imageFromPhotoId(img);
 
   if (compact) {
     return (
       <Link to={`/hotels/${hotel.slug}`} className="flex gap-3 bg-white rounded-xl border border-neutral-200 p-3 hover:shadow-md transition-shadow group">
         <div className="w-20 h-20 shrink-0 rounded-lg overflow-hidden bg-neutral-200">
-          <img src={imgUrl} alt={hotel.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
+          <SafeImage src={imgUrl} alt={hotel.name} fallback="hotel" className="h-full w-full" imageClassName="transition-transform duration-300 group-hover:scale-105" />
         </div>
         <div className="flex-1 min-w-0">
           <div className="flex items-start justify-between gap-2">
@@ -44,12 +46,7 @@ export default function HotelCard({ hotel, compact = false }: { hotel: Hotel; co
     <div className="bg-white rounded-2xl border border-neutral-200 overflow-hidden hover:shadow-lg transition-shadow duration-300 group flex flex-col">
       {/* Image */}
       <div className="relative img-zoom aspect-[4/3]">
-        <img
-          src={imgUrl}
-          alt={hotel.name}
-          className="w-full h-full object-cover"
-          loading="lazy"
-        />
+        <SafeImage src={imgUrl} alt={`${hotel.name} exterior`} fallback="hotel" className="h-full w-full" imageClassName="transition-transform duration-500 group-hover:scale-105" sizes="(min-width: 1024px) 30vw, (min-width: 640px) 50vw, 100vw" />
         <Button
           onClick={e => { e.preventDefault(); toggleSaved(hotel.id); }}
           className={`absolute top-3 right-3 w-9 h-9 rounded-full flex items-center justify-center transition-colors ${saved ? "bg-brand-700 text-white" : "bg-white/90 text-neutral-600 hover:bg-white"}`}

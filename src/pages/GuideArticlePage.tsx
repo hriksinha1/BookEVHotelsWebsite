@@ -2,6 +2,8 @@ import { Link } from "react-router-dom";
 import { ChevronRight, Clock, CheckCircle2, ArrowRight } from "lucide-react";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
+import SafeImage from "../components/SafeImage";
+import { imageRegistry } from "../data/images";
 
 export default function GuideArticlePage() {
   return (
@@ -37,10 +39,13 @@ export default function GuideArticlePage() {
                   <span>Updated September 2025</span>
                 </div>
                 <div className="aspect-[16/7] bg-neutral-200 rounded-2xl overflow-hidden">
-                  <img
-                    src="https://images.unsplash.com/photo-1593941707874-ef25b8b4a92b?w=1200&h=525&fit=crop&auto=format"
+                  <SafeImage
+                    src={imageRegistry.hero}
                     alt="Person connecting an EV charger at a hotel"
-                    className="w-full h-full object-cover"
+                    fallback="guide"
+                    className="h-full w-full"
+                    loading="eager"
+                    fetchPriority="high"
                   />
                 </div>
               </div>

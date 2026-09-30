@@ -3,7 +3,7 @@ import { useParams, Link, useNavigate } from "react-router-dom";
 import {
   Star, MapPin, CheckCircle2, ExternalLink, Bookmark,
   Share2, ChevronRight, Phone, Info, ArrowRight,
-  Building2, Zap, BadgeCheck, Calendar
+  Building2, Zap, BadgeCheck, Calendar, X, Images, ChevronLeft, ChevronRight as ChevronRightIcon
 } from "lucide-react";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
@@ -13,6 +13,9 @@ import { hotels, getHotelBySlug, formatPrice } from "../data/hotels";
 import type { Charger, RoomType } from "../data/hotels";
 import SearchBar from "../components/SearchBar";
 import { useSearchState } from "../hooks/useSearchState";
+import SafeImage from "../components/SafeImage";
+import { imageFromPhotoId } from "../data/images";
+import { Button } from "../components/ui";
 
 function ChargerRow({ charger }: { charger: Charger }) {
   return (
@@ -45,13 +48,13 @@ function ChargerRow({ charger }: { charger: Charger }) {
 }
 
 function RoomCard({ room, selected, onSelect }: { room: RoomType; selected: boolean; onSelect: () => void }) {
-  const imgUrl = `https://images.unsplash.com/${room.image}?w=400&h=250&fit=crop&auto=format`;
+  const imgUrl = imageFromPhotoId(room.image);
   const isAvailable = room.availability !== "sold-out";
 
   return (
     <div className={`rounded-xl border-2 transition-colors overflow-hidden ${selected ? "border-brand-700" : "border-neutral-200"} ${!isAvailable ? "opacity-60" : ""}`}>
       <div className="aspect-[16/9] bg-neutral-200 overflow-hidden">
-        <img src={imgUrl} alt={room.name} className="w-full h-full object-cover" />
+        <SafeImage src={imgUrl} alt={`${room.name} interior`} fallback="room" className="h-full w-full" sizes="(min-width: 1024px) 40vw, 100vw" />
       </div>
       <div className="p-4">
         <div className="flex items-start justify-between gap-2 mb-2">
@@ -106,6 +109,7 @@ export default function HotelDetailPage() {
   const [selectedRoom, setSelectedRoom] = useState<string | null>(null);
   const [saved, setSaved] = useState(false);
   const [activePhoto, setActivePhoto] = useState(0);
+  const [galleryOpen, setGalleryOpen] = useState(false);
   const [showVerification, setShowVerification] = useState(false);
   const [searchState] = useSearchState(`${hotel?.city || ""}, ${hotel?.state || ""}`);
 
@@ -193,24 +197,35 @@ export default function HotelDetailPage() {
           </div>
 
           {/* Photo gallery */}
-          <div className="grid grid-cols-4 gap-2 rounded-2xl overflow-hidden mb-8 aspect-[16/6]">
-            <div className="col-span-2 row-span-2 overflow-hidden bg-neutral-200">
-              <img
-                src={`https://images.unsplash.com/${hotel.images[0]}?w=800&h=600&fit=crop&auto=format`}
-                alt={hotel.name}
-                className="w-full h-full object-cover cursor-pointer hover:opacity-95 transition-opacity"
-              />
-            </div>
+          <div className="relative mb-8 grid aspect-[4/3] grid-cols-4 gap-2 overflow-hidden rounded-2xl sm:aspect-[16/7]">
+            <Button onClick={() => { setActivePhoto(0); setGalleryOpen(true); }} className="col-span-4 row-span-2 overflow-hidden bg-neutral-200 sm:col-span-2" aria-label={`Open photos for ${hotel.name}`}>
+              <SafeImage src={imageFromPhotoId(hotel.images[0])} alt={`${hotel.name} main view`} fallback="hotel" className="h-full w-full" imageClassName="transition-transform duration-500 hover:scale-105" loading="eager" fetchPriority="high" />
+            </Button>
             {hotel.images.slice(1, 5).map((img, i) => (
-              <div key={i} className="overflow-hidden bg-neutral-200">
-                <img
-                  src={`https://images.unsplash.com/${img}?w=400&h=300&fit=crop&auto=format`}
-                  alt={`${hotel.name} photo ${i + 2}`}
-                  className="w-full h-full object-cover cursor-pointer hover:opacity-95 transition-opacity"
-                />
-              </div>
+              <Button key={img} onClick={() => { setActivePhoto(i + 1); setGalleryOpen(true); }} className="hidden overflow-hidden bg-neutral-200 sm:block" aria-label={`Open photo ${i + 2} of ${hotel.name}`}>
+                <SafeImage src={imageFromPhotoId(img)} alt={`${hotel.name} view ${i + 2}`} fallback="hotel" className="h-full w-full" imageClassName="transition-transform duration-500 hover:scale-105" />
+              </Button>
             ))}
+            <Button onClick={() => setGalleryOpen(true)} className="absolute bottom-4 right-4 flex min-h-11 items-center gap-2 rounded-xl bg-white px-4 text-sm font-semibold text-neutral-950 shadow-lg">
+              <Images size={16} /> View all photos
+            </Button>
           </div>
+
+          {galleryOpen && (
+            <div className="fixed inset-0 z-[70] flex items-center justify-center bg-neutral-950/95 p-4" role="dialog" aria-modal="true" aria-label={`${hotel.name} photo gallery`}>
+              <Button onClick={() => setGalleryOpen(false)} className="absolute right-4 top-4 flex h-11 w-11 items-center justify-center rounded-full bg-white text-neutral-950" aria-label="Close photo gallery">
+                <X size={20} />
+              </Button>
+              <Button onClick={() => setActivePhoto(current => (current - 1 + hotel.images.length) % hotel.images.length)} className="absolute left-4 flex h-11 w-11 items-center justify-center rounded-full bg-white text-neutral-950" aria-label="Previous photo">
+                <ChevronLeft size={20} />
+              </Button>
+              <SafeImage src={imageFromPhotoId(hotel.images[activePhoto])} alt={`${hotel.name} photo ${activePhoto + 1}`} fallback="hotel" className="aspect-[4/3] max-h-[80vh] w-full max-w-5xl rounded-xl" imageClassName="object-contain" loading="eager" />
+              <Button onClick={() => setActivePhoto(current => (current + 1) % hotel.images.length)} className="absolute right-4 flex h-11 w-11 items-center justify-center rounded-full bg-white text-neutral-950" aria-label="Next photo">
+                <ChevronRightIcon size={20} />
+              </Button>
+              <p className="absolute bottom-5 text-sm text-white">{activePhoto + 1} of {hotel.images.length}</p>
+            </div>
+          )}
 
           <div className="grid lg:grid-cols-3 gap-8">
             {/* Main content */}

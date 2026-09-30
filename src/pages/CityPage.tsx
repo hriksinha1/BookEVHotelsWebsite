@@ -4,6 +4,8 @@ import Header from "../components/Header";
 import Footer from "../components/Footer";
 import HotelCard from "../components/HotelCard";
 import { hotels } from "../data/hotels";
+import SafeImage from "../components/SafeImage";
+import { imageFromPhotoId } from "../data/images";
 
 // Simple city data for the template
 const cityData: Record<string, { state: string; description: string; image: string }> = {
@@ -58,10 +60,13 @@ export default function CityPage() {
 
         {/* Hero */}
         <section className="relative h-64 overflow-hidden">
-          <img
-            src={`https://images.unsplash.com/${img}?w=1200&h=400&fit=crop&auto=format`}
+          <SafeImage
+            src={imageFromPhotoId(img)}
             alt={cityName}
-            className="w-full h-full object-cover"
+            fallback="destination"
+            className="h-full w-full"
+            loading="eager"
+            fetchPriority="high"
           />
           <div className="absolute inset-0 bg-gradient-to-t from-neutral-950/80 via-neutral-950/40 to-transparent" />
           <div className="absolute bottom-6 left-0 right-0 max-w-7xl mx-auto px-4 sm:px-6">

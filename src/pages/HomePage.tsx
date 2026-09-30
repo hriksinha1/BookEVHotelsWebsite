@@ -19,20 +19,13 @@ import HotelCard from "../components/HotelCard";
 import EVChargingSummary from "../components/EVChargingSummary";
 import { Heading } from "../components/ui";
 import { hotels } from "../data/hotels";
-
-const destinationImages: Record<string, string> = {
-  Bengaluru: "photo-1596178060671-7a80dc8059ea",
-  Udaipur: "photo-1549996168-1e8e3b1f8e8d",
-  Goa: "photo-1512343879784-a960bf40e7f2",
-  Jaipur: "photo-1477587458883-47145ed31fd0",
-  Coorg: "photo-1606298855672-3efb63017be8",
-  Manali: "photo-1506905925346-21bda4d32df4",
-};
+import SafeImage from "../components/SafeImage";
+import { imageRegistry } from "../data/images";
 
 const destinations = Array.from(
   new Map(hotels.map(hotel => [hotel.city, { city: hotel.city, state: hotel.state }])).values(),
 )
-  .filter(destination => destinationImages[destination.city])
+  .filter(destination => imageRegistry.destinations[destination.city])
   .slice(0, 6);
 
 const verificationPrinciples = [
@@ -70,10 +63,13 @@ export default function HomePage() {
       <Header transparent />
       <main>
         <section className="relative flex min-h-screen items-center overflow-hidden bg-neutral-950">
-          <img
-            src="https://images.unsplash.com/photo-1593941707874-ef25b8b4a92b?w=1800&h=1200&fit=crop&auto=format"
+          <SafeImage
+            src={imageRegistry.hero}
             alt="Electric car ready for an Indian road trip"
-            className="absolute inset-0 h-full w-full object-cover opacity-60"
+            fallback="hero"
+            className="absolute inset-0 h-full w-full"
+            imageClassName="opacity-70"
+            loading="eager"
             fetchPriority="high"
           />
           <div className="absolute inset-0 bg-gradient-to-b from-neutral-950/50 via-neutral-950/40 to-neutral-950/90" />
@@ -169,11 +165,13 @@ export default function HomePage() {
                   to={`/destinations/${destination.state.toLowerCase().replaceAll(" ", "-")}/${destination.city.toLowerCase().replaceAll(" ", "-")}`}
                   className={`group relative overflow-hidden rounded-2xl bg-neutral-900 ${index === 0 ? "sm:col-span-2 lg:col-span-1" : ""}`}
                 >
-                  <img
-                    src={`https://images.unsplash.com/${destinationImages[destination.city]}?w=800&h=560&fit=crop&auto=format`}
+                  <SafeImage
+                    src={imageRegistry.destinations[destination.city]}
                     alt={`${destination.city}, ${destination.state}`}
-                    className="aspect-[4/3] h-full w-full object-cover opacity-80 transition-transform duration-500 group-hover:scale-105"
-                    loading="lazy"
+                    fallback="destination"
+                    className="aspect-[4/3] h-full w-full"
+                    imageClassName="opacity-90 transition-transform duration-500 group-hover:scale-105"
+                    sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-neutral-950/90 via-transparent to-transparent" />
                   <div className="absolute inset-x-0 bottom-0 p-5">

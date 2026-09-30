@@ -4,16 +4,8 @@ import Header from "../components/Header";
 import Footer from "../components/Footer";
 import { Heading } from "../components/ui";
 import { hotels } from "../data/hotels";
-
-const images: Record<string, string> = {
-  Bengaluru: "photo-1596178060671-7a80dc8059ea",
-  Jaipur: "photo-1477587458883-47145ed31fd0",
-  Goa: "photo-1512343879784-a960bf40e7f2",
-  Manali: "photo-1506905925346-21bda4d32df4",
-  Coorg: "photo-1606298855672-3efb63017be8",
-  Udaipur: "photo-1549996168-1e8e3b1f8e8d",
-  Kabini: "photo-1509316785289-025f5b846b35",
-};
+import SafeImage from "../components/SafeImage";
+import { imageFromPhotoId, imageRegistry } from "../data/images";
 
 const toSlug = (value: string) => value.toLowerCase().replaceAll(" ", "-");
 
@@ -50,11 +42,13 @@ export default function DestinationsPage() {
                   to={`/destinations/${toSlug(destination.state)}/${toSlug(destination.city)}`}
                   className="group relative overflow-hidden rounded-2xl bg-neutral-950"
                 >
-                  <img
-                    src={`https://images.unsplash.com/${images[destination.city] ?? hotels.find(hotel => hotel.city === destination.city)?.images[0]}?w=800&h=560&fit=crop&auto=format`}
+                  <SafeImage
+                    src={imageRegistry.destinations[destination.city] ?? imageFromPhotoId(hotels.find(hotel => hotel.city === destination.city)?.images[0] ?? "")}
                     alt={`${destination.city}, ${destination.state}`}
-                    className="aspect-[4/3] w-full object-cover opacity-75 transition-transform duration-500 group-hover:scale-105"
-                    loading="lazy"
+                    fallback="destination"
+                    className="aspect-[4/3] w-full"
+                    imageClassName="opacity-90 transition-transform duration-500 group-hover:scale-105"
+                    sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-neutral-950 via-transparent to-transparent" />
                   <div className="absolute inset-x-0 bottom-0 p-5">

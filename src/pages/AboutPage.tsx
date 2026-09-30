@@ -2,6 +2,8 @@ import { Link } from "react-router-dom";
 import { CheckCircle2, ArrowRight, Phone, Camera, BadgeCheck } from "lucide-react";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
+import SafeImage from "../components/SafeImage";
+import { imageRegistry } from "../data/images";
 
 export default function AboutPage() {
   return (
@@ -10,10 +12,13 @@ export default function AboutPage() {
       <div className="pt-16">
         {/* Hero */}
         <section className="relative h-80 overflow-hidden">
-          <img
-            src="https://images.unsplash.com/photo-1593941707874-ef25b8b4a92b?w=1400&h=500&fit=crop&auto=format"
+          <SafeImage
+            src={imageRegistry.about}
             alt="EV travellers arriving at a hotel with an EV charger"
-            className="w-full h-full object-cover"
+            fallback="hero"
+            className="h-full w-full"
+            loading="eager"
+            fetchPriority="high"
           />
           <div className="absolute inset-0 bg-neutral-950/60" />
           <div className="absolute inset-0 flex items-center">

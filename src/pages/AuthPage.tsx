@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Zap, Mail, Phone, Eye, EyeOff } from "lucide-react";
+import SafeImage from "../components/SafeImage";
+import { imageRegistry } from "../data/images";
 
 export function LoginPage() {
   const [email, setEmail] = useState("");
@@ -25,10 +27,12 @@ export function LoginPage() {
           <p className="text-[15px] text-neutral-400">Find a hotel where your EV can charge while you sleep.</p>
         </div>
         <div className="relative aspect-video rounded-2xl overflow-hidden">
-          <img
-            src="https://images.unsplash.com/photo-1593941707874-ef25b8b4a92b?w=700&h=394&fit=crop&auto=format"
+          <SafeImage
+            src={imageRegistry.hero}
             alt="EV charging at a hotel"
-            className="w-full h-full object-cover opacity-70"
+            fallback="hero"
+            className="h-full w-full"
+            imageClassName="opacity-80"
           />
         </div>
       </div>

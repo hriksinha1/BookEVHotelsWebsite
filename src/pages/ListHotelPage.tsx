@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { CheckCircle2, ChevronRight, Upload, X, Phone, Camera, BadgeCheck, Zap } from "lucide-react";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
+import SafeImage from "../components/SafeImage";
 
 const steps = ["Property", "Charger", "Photos", "Billing", "Payment"];
 
@@ -240,7 +241,7 @@ export default function ListHotelPage() {
                     <div className="grid grid-cols-2 gap-3">
                       {photos.map((f, i) => (
                         <div key={i} className="relative bg-neutral-100 rounded-xl overflow-hidden aspect-video flex items-center justify-center">
-                          <img src={URL.createObjectURL(f)} alt="" className="w-full h-full object-cover" />
+                          <SafeImage src={URL.createObjectURL(f)} alt={`Charger upload ${i + 1}`} fallback="editorial" className="h-full w-full" />
                           <button onClick={() => setPhotos(photos.filter((_, j) => j !== i))} className="absolute top-2 right-2 w-6 h-6 bg-white rounded-full flex items-center justify-center shadow">
                             <X size={12} />
                           </button>

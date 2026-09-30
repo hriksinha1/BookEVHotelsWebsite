@@ -7,6 +7,8 @@ import { Button, Heading, Input, Label, Textarea } from "../components/ui";
 import { formatPrice, getHotelBySlug } from "../data/hotels";
 import type { RoomType } from "../data/hotels";
 import { useBookings } from "../hooks/useBookings";
+import SafeImage from "../components/SafeImage";
+import { imageFromPhotoId } from "../data/images";
 
 interface GuestDetails {
   firstName: string;
@@ -250,7 +252,7 @@ export default function BookingFlowPage() {
         <BookingSteps current={stepNumber} />
         <div className="mx-auto max-w-3xl px-4 py-10 sm:px-6">
           <div className="mb-6 flex items-center gap-3 rounded-xl border border-neutral-200 bg-white p-4">
-            <img src={`https://images.unsplash.com/${hotel.images[0]}?w=120&h=120&fit=crop&auto=format`} alt="" className="h-14 w-14 rounded-lg object-cover" />
+            <SafeImage src={imageFromPhotoId(hotel.images[0])} alt="" fallback="hotel" className="h-14 w-14 shrink-0 rounded-lg" />
             <div>
               <p className="text-sm font-semibold text-neutral-950">{hotel.name}</p>
               <p className="mt-1 text-xs text-neutral-600">{hotel.city}, {hotel.state}{nights > 0 ? ` · ${nights} ${nights === 1 ? "night" : "nights"}` : ""}</p>

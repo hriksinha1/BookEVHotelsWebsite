@@ -7,6 +7,8 @@ import HotelCard from "../components/HotelCard";
 import { hotels, formatPrice } from "../data/hotels";
 import { useSavedHotels } from "../hooks/useSavedHotels";
 import { useBookings } from "../hooks/useBookings";
+import SafeImage from "../components/SafeImage";
+import { imageFromPhotoId } from "../data/images";
 
 const statusConfig = {
   confirmed: { label: "Confirmed", bg: "bg-success-bg", text: "text-success-text", icon: CheckCircle2 },
@@ -33,10 +35,11 @@ function BookingCard({ booking }: { booking: AccountBooking }) {
     <div className="bg-white rounded-2xl border border-neutral-200 p-5">
       <div className="flex items-start gap-4">
         <div className="w-16 h-16 rounded-xl overflow-hidden bg-neutral-200 shrink-0">
-          <img
-            src={`https://images.unsplash.com/${booking.hotel.images[0]}?w=120&h=120&fit=crop&auto=format`}
+          <SafeImage
+            src={imageFromPhotoId(booking.hotel.images[0])}
             alt={booking.hotel.name}
-            className="w-full h-full object-cover"
+            fallback="hotel"
+            className="h-full w-full"
           />
         </div>
         <div className="flex-1 min-w-0">

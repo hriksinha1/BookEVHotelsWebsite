@@ -1,7 +1,11 @@
+import { useState } from "react";
 import { Link } from "react-router-dom";
 import { Clock, ChevronRight } from "lucide-react";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
+import SafeImage from "../components/SafeImage";
+import { imageFromPhotoId } from "../data/images";
+import { Button } from "../components/ui";
 
 const guides = [
   {
@@ -63,6 +67,9 @@ const guides = [
 const categories = ["All", "EV road trips", "Charging basics", "Hotel selection", "Destination guides", "Route planning"];
 
 export default function GuidesPage() {
+  const [category, setCategory] = useState("All");
+  const visibleGuides = category === "All" ? guides : guides.filter(guide => guide.category === category);
+
   return (
     <div className="min-h-screen bg-neutral-50">
       <Header />
@@ -82,15 +89,17 @@ export default function GuidesPage() {
         <div className="bg-white border-b border-neutral-200">
           <div className="max-w-7xl mx-auto px-4 sm:px-6">
             <div className="flex gap-2 py-4 overflow-x-auto">
-              {categories.map(cat => (
-                <button
+              {categories.filter(cat => cat === "All" || guides.some(guide => guide.category === cat)).map(cat => (
+                <Button
                   key={cat}
+                  onClick={() => setCategory(cat)}
+                  aria-pressed={category === cat}
                   className={`shrink-0 px-4 py-2 rounded-full text-[13px] font-medium transition-colors ${
-                    cat === "All" ? "bg-brand-700 text-white" : "border border-neutral-300 text-neutral-700 hover:bg-neutral-100"
+                    category === cat ? "bg-brand-700 text-white" : "border border-neutral-300 text-neutral-700 hover:bg-neutral-100"
                   }`}
                 >
                   {cat}
-                </button>
+                </Button>
               ))}
             </div>
           </div>
@@ -100,13 +109,16 @@ export default function GuidesPage() {
         <section className="py-14">
           <div className="max-w-7xl mx-auto px-4 sm:px-6">
             <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-7">
-              {guides.map(guide => (
+              {visibleGuides.map(guide => (
                 <Link key={guide.slug} to={`/guides/${guide.slug}`} className="bg-white rounded-2xl border border-neutral-200 overflow-hidden hover:shadow-lg transition-shadow group">
                   <div className="aspect-video bg-neutral-200 overflow-hidden">
-                    <img
-                      src={`https://images.unsplash.com/${guide.image}?w=600&h=337&fit=crop&auto=format`}
+                    <SafeImage
+                      src={imageFromPhotoId(guide.image)}
                       alt={guide.title}
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-400"
+                      fallback="guide"
+                      className="h-full w-full"
+                      imageClassName="transition-transform duration-500 group-hover:scale-105"
+                      sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
                     />
                   </div>
                   <div className="p-5">
