@@ -1,102 +1,78 @@
 import { Link } from "react-router-dom";
-import { Zap, Mail } from "lucide-react";
+import { Mail, Zap } from "lucide-react";
+import { Heading } from "./ui";
+
+const footerGroups = [
+  {
+    title: "Explore",
+    links: [
+      { label: "Explore EV Hotels", to: "/search" },
+      { label: "Destinations", to: "/destinations" },
+      { label: "Travel Guides", to: "/guides" },
+      { label: "EV Hotel Report", to: "/india-ev-hotel-report" },
+    ],
+  },
+  {
+    title: "For travellers",
+    links: [
+      { label: "How verification works", to: "/about" },
+      { label: "Frequently asked questions", to: "/faqs" },
+      { label: "Saved hotels", to: "/account/saved" },
+      { label: "My bookings", to: "/account/bookings" },
+    ],
+  },
+  {
+    title: "For hotels",
+    links: [{ label: "List Your Hotel", to: "/list-your-hotel" }],
+  },
+  {
+    title: "Legal",
+    links: [
+      { label: "Privacy", to: "/privacy" },
+      { label: "Terms", to: "/terms" },
+      { label: "Cookies", to: "/cookies" },
+    ],
+  },
+];
 
 export default function Footer() {
-  const year = new Date().getFullYear();
-
   return (
     <footer className="bg-neutral-950 text-white">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-16">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-12">
-          {/* Brand */}
+      <div className="mx-auto max-w-7xl px-4 py-16 sm:px-6">
+        <div className="grid gap-12 md:grid-cols-2 lg:grid-cols-6">
           <div className="lg:col-span-2">
-            <Link to="/" className="flex items-center gap-2 mb-4">
-              <div className="w-8 h-8 bg-brand-700 rounded-lg flex items-center justify-center">
-                <Zap size={16} className="text-white fill-white" />
-              </div>
-              <span className="font-bold text-[15px]">Book EV Hotels</span>
+            <Link to="/" className="mb-5 flex items-center gap-2">
+              <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-brand-700">
+                <Zap size={17} className="fill-white text-white" />
+              </span>
+              <span className="font-bold">Book EV Hotels</span>
             </Link>
-            <p className="text-neutral-300 text-[14px] leading-[22px] max-w-xs mb-6">
-              India's trusted directory of hotels with verified EV charging facilities. Drive sustainable, stay charged.
+            <p className="max-w-sm text-sm leading-relaxed text-neutral-300">
+              Know your stay. Know your charger. Enjoy the drive.
             </p>
-            <div className="flex items-center gap-3">
-              <a href="mailto:hello@bookevhotels.com" className="flex items-center gap-2 text-neutral-400 hover:text-brand-400 text-[14px] transition-colors">
-                <Mail size={14} />
-                hello@bookevhotels.com
-              </a>
+            <Link to="mailto:hello@bookevhotels.com" className="mt-6 inline-flex min-h-11 items-center gap-2 text-sm text-neutral-300 hover:text-brand-300">
+              <Mail size={15} /> hello@bookevhotels.com
+            </Link>
+          </div>
+          {footerGroups.map(group => (
+            <div key={group.title}>
+              <Heading level={3} className="mb-4 text-sm font-semibold text-white">{group.title}</Heading>
+              <ul className="space-y-3">
+                {group.links.map(link => (
+                  <li key={link.to}>
+                    <Link to={link.to} className="text-sm leading-relaxed text-neutral-300 transition-colors hover:text-brand-300">
+                      {link.label}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
             </div>
-            <div className="mt-4 flex gap-3">
-              <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" className="text-neutral-400 hover:text-brand-400 transition-colors text-[13px] font-medium" aria-label="Instagram">
-                Instagram
-              </a>
-              <a href="https://play.google.com" target="_blank" rel="noopener noreferrer" className="text-neutral-400 hover:text-brand-400 text-[12px] font-medium transition-colors">
-                Google Play
-              </a>
-            </div>
-          </div>
-
-          {/* Explore */}
-          <div>
-            <h3 className="text-[14px] font-semibold mb-4 text-white">Explore</h3>
-            <ul className="space-y-3">
-              {[
-                { label: "Search EV Hotels", to: "/search" },
-                { label: "Destinations", to: "/destinations" },
-                { label: "Travel Guides", to: "/guides" },
-                { label: "India EV Hotel Report", to: "/india-ev-hotel-report" },
-              ].map(link => (
-                <li key={link.to}>
-                  <Link to={link.to} className="text-neutral-300 hover:text-brand-400 text-[14px] leading-[22px] transition-colors">
-                    {link.label}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          {/* Company */}
-          <div>
-            <h3 className="text-[14px] font-semibold mb-4 text-white">Company</h3>
-            <ul className="space-y-3">
-              {[
-                { label: "About us", to: "/about" },
-                { label: "FAQs", to: "/faqs" },
-                { label: "List Your Hotel", to: "/list-your-hotel" },
-              ].map(link => (
-                <li key={link.to}>
-                  <Link to={link.to} className="text-neutral-300 hover:text-brand-400 text-[14px] leading-[22px] transition-colors">
-                    {link.label}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          {/* Legal */}
-          <div>
-            <h3 className="text-[14px] font-semibold mb-4 text-white">Legal</h3>
-            <ul className="space-y-3">
-              {[
-                { label: "Privacy Policy", to: "/privacy" },
-                { label: "Terms of Use", to: "/terms" },
-                { label: "Cookie Policy", to: "/cookies" },
-              ].map(link => (
-                <li key={link.to}>
-                  <Link to={link.to} className="text-neutral-300 hover:text-brand-400 text-[14px] leading-[22px] transition-colors">
-                    {link.label}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </div>
+          ))}
         </div>
-
-        <div className="mt-12 pt-8 border-t border-neutral-800 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-          <p className="text-neutral-500 text-[12px] leading-[18px]">
-            © {year} Book EV Hotels. India, all rights reserved.
-          </p>
-          <p className="text-neutral-600 text-[12px] leading-[18px] max-w-md">
-            Hotel bookings are facilitated via partner affiliate links. Book EV Hotels is not liable for third-party booking outcomes.
+        <div className="mt-12 flex flex-col gap-3 border-t border-neutral-800 pt-8 text-xs leading-relaxed text-neutral-400 sm:flex-row sm:justify-between">
+          <p>© {new Date().getFullYear()} Book EV Hotels. India.</p>
+          <p className="max-w-xl">
+            Charger verification is point-in-time and does not guarantee live availability. Confirm with the property on your travel day.
           </p>
         </div>
       </div>

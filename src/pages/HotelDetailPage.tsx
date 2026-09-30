@@ -11,6 +11,8 @@ import { VerifiedBadge, AccessChip, ChargerSpecLine } from "../components/EVBadg
 import HotelCard from "../components/HotelCard";
 import { hotels, getHotelBySlug, formatPrice } from "../data/hotels";
 import type { Charger, RoomType } from "../data/hotels";
+import SearchBar from "../components/SearchBar";
+import { useSearchState } from "../hooks/useSearchState";
 
 function ChargerRow({ charger }: { charger: Charger }) {
   return (
@@ -59,7 +61,7 @@ function RoomCard({ room, selected, onSelect }: { room: RoomType; selected: bool
           </div>
           {room.availability === "limited" && (
             <span className="bg-warning-bg text-warning-text text-[11px] font-semibold px-2.5 py-1 rounded-full shrink-0">
-              Only 2 left
+              Limited availability
             </span>
           )}
         </div>
@@ -105,6 +107,7 @@ export default function HotelDetailPage() {
   const [saved, setSaved] = useState(false);
   const [activePhoto, setActivePhoto] = useState(0);
   const [showVerification, setShowVerification] = useState(false);
+  const [searchState] = useSearchState(`${hotel?.city || ""}, ${hotel?.state || ""}`);
 
   if (!hotel) {
     return (
@@ -120,10 +123,18 @@ export default function HotelDetailPage() {
   }
 
   const nearbyHotels = hotels.filter(h => h.city === hotel.city && h.id !== hotel.id).slice(0, 3);
+  const nights = searchState.checkIn && searchState.checkOut
+    ? Math.max(0, Math.round((new Date(searchState.checkOut).getTime() - new Date(searchState.checkIn).getTime()) / 86400000))
+    : 0;
 
   const handleBook = () => {
     if (!selectedRoom) return;
-    navigate(`/booking/${hotel.slug}/rooms?room=${selectedRoom}`);
+    const bookingParams = new URLSearchParams({
+      room: selectedRoom,
+      ...(searchState.checkIn ? { checkin: searchState.checkIn } : {}),
+      ...(searchState.checkOut ? { checkout: searchState.checkOut } : {}),
+    });
+    navigate(`/booking/${hotel.slug}/${nights > 0 ? "guest" : "rooms"}?${bookingParams.toString()}`);
   };
 
   return (
@@ -216,7 +227,9 @@ export default function HotelDetailPage() {
                     </div>
                   </div>
                   {hotel.verifiedAt && (
-                    <span className="text-[12px] text-neutral-500">Last verified: {hotel.verifiedAt}</span>
+                    <span className="text-[12px] text-neutral-500">
+                      Verified {new Intl.DateTimeFormat("en-IN", { day: "numeric", month: "long", year: "numeric" }).format(new Date(`${hotel.verifiedAt}T12:00:00`))}
+                    </span>
                   )}
                 </div>
 
@@ -245,6 +258,9 @@ export default function HotelDetailPage() {
 
               {/* Room selection */}
               <div>
+                <div className="mb-6">
+                  <SearchBar compact defaultDestination={`${hotel.city}, ${hotel.state}`} />
+                </div>
                 <h2 className="text-[24px] font-bold text-neutral-950 mb-5">Select your room</h2>
                 <div className="space-y-4">
                   {hotel.roomTypes.map(room => (
@@ -279,8 +295,12 @@ export default function HotelDetailPage() {
                   <MapPin size={15} className="text-neutral-500 shrink-0 mt-0.5" />
                   <p className="text-[14px] text-neutral-700">{hotel.address}</p>
                 </div>
-                <div className="aspect-[16/7] bg-neutral-200 rounded-xl overflow-hidden mb-4 flex items-center justify-center">
-                  <p className="text-neutral-500 text-[14px]">Map placeholder — {hotel.city}</p>
+                <div className="aspect-[16/7] bg-neutral-950 rounded-xl overflow-hidden mb-4 flex items-center justify-center">
+                  <div className="text-center">
+                    <MapPin size={24} className="text-brand-400 mx-auto mb-2" />
+                    <p className="text-white text-[14px] font-semibold">{hotel.city}, {hotel.state}</p>
+                    <p className="text-neutral-400 text-[12px] mt-1">{hotel.coordinates.lat}, {hotel.coordinates.lng}</p>
+                  </div>
                 </div>
                 <a
                   href={`https://maps.google.com/?q=${encodeURIComponent(hotel.address)}`}
@@ -324,23 +344,23 @@ export default function HotelDetailPage() {
                               </div>
                               <div className="space-y-2 mb-4 pb-4 border-b border-neutral-100">
                                 <div className="flex justify-between text-[14px]">
-                                  <span className="text-neutral-600">{formatPrice(room.pricePerNight)} × 2 nights</span>
-                                  <span className="font-medium text-neutral-950 tabular-nums">{formatPrice(room.pricePerNight * 2)}</span>
+                                  <span className="text-neutral-600">{nights > 0 ? `${formatPrice(room.pricePerNight)} × ${nights} nights` : "Room price per night"}</span>
+                                  <span className="font-medium text-neutral-950 tabular-nums">{formatPrice(room.pricePerNight * Math.max(1, nights))}</span>
                                 </div>
                                 <div className="flex justify-between text-[14px]">
                                   <span className="text-neutral-600">Taxes & fees</span>
-                                  <span className="font-medium text-neutral-950 tabular-nums">{formatPrice(room.taxesPerNight * 2)}</span>
+                                  <span className="font-medium text-neutral-950 tabular-nums">{formatPrice(room.taxesPerNight * Math.max(1, nights))}</span>
                                 </div>
                               </div>
                               <div className="flex justify-between mb-5">
                                 <span className="text-[15px] font-semibold text-neutral-950">Total</span>
-                                <span className="text-[18px] font-bold text-neutral-950 tabular-nums">{formatPrice((room.pricePerNight + room.taxesPerNight) * 2)}</span>
+                                <span className="text-[18px] font-bold text-neutral-950 tabular-nums">{formatPrice((room.pricePerNight + room.taxesPerNight) * Math.max(1, nights))}</span>
                               </div>
                               {/* EV summary */}
                               <div className="bg-brand-50 rounded-xl p-3 mb-5">
                                 <div className="flex items-center gap-2 mb-2">
                                   <CheckCircle2 size={13} className="text-brand-700" />
-                                  <span className="text-[12px] font-semibold text-brand-800">EV Charging Included</span>
+                                  <span className="text-[12px] font-semibold text-brand-800">EV charging available</span>
                                 </div>
                                 {hotel.chargers[0] && (
                                   <p className="text-[12px] text-brand-700">
@@ -353,7 +373,7 @@ export default function HotelDetailPage() {
                                 onClick={handleBook}
                                 className="w-full bg-brand-700 hover:bg-brand-800 text-white py-3.5 rounded-xl text-[15px] font-semibold transition-colors"
                               >
-                                Book now
+                                {nights > 0 ? "Continue with this room" : "Choose dates"}
                               </button>
                               <p className="text-[12px] text-neutral-500 text-center mt-2">
                                 {hotel.roomTypes.find(r => r.id === selectedRoom)?.cancellation === "Free" ? "✓ Free cancellation" : "Non-refundable"}

@@ -36,6 +36,8 @@ export default function CityPage() {
   const guestOnlyCount = cityHotels.filter(h => h.chargers.every(c => c.access === "Guest Only")).length;
 
   const img = data?.image || "photo-1596178060671-7a80dc8059ea";
+  const confirmedPowers = cityHotels.flatMap(h => h.chargers.map(c => c.powerKw).filter((power): power is number => power !== null));
+  const maxPower = confirmedPowers.length ? `${Math.max(...confirmedPowers)} kW` : "Not confirmed";
 
   return (
     <div className="min-h-screen bg-neutral-50">
@@ -74,10 +76,10 @@ export default function CityPage() {
           {/* Quick stats */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-10">
             {[
-              { label: "Verified hotels", value: cityHotels.length || "12" },
-              { label: "Public charging", value: publicCount || "9" },
-              { label: "Guest only", value: guestOnlyCount || "3" },
-              { label: "Max charger power", value: "60 kW" },
+              { label: "Verified hotels", value: cityHotels.length },
+              { label: "Public charging", value: publicCount },
+              { label: "Guest only", value: guestOnlyCount },
+              { label: "Highest confirmed power", value: maxPower },
             ].map(s => (
               <div key={s.label} className="bg-white rounded-xl border border-neutral-200 p-4">
                 <p className="text-[28px] font-bold text-neutral-950 tabular-nums">{s.value}</p>
@@ -117,11 +119,11 @@ export default function CityPage() {
               {faqs.map((faq, i) => (
                 <details key={i} className="bg-white border border-neutral-200 rounded-xl overflow-hidden group">
                   <summary className="px-5 py-4 cursor-pointer text-[16px] font-semibold text-neutral-950 list-none flex items-center justify-between">
-                    {faq.q.replace(/{city}/g, cityName).replace(/{count}/g, String(cityHotels.length || 12))}
+                    {faq.q.replace(/{city}/g, cityName).replace(/{count}/g, String(cityHotels.length))}
                     <ChevronRight size={16} className="text-neutral-400 group-open:rotate-90 transition-transform" />
                   </summary>
                   <div className="px-5 pb-4 text-[15px] text-neutral-700 leading-[26px]">
-                    {faq.a.replace(/{city}/g, cityName).replace(/{count}/g, String(cityHotels.length || 12))}
+                    {faq.a.replace(/{city}/g, cityName).replace(/{count}/g, String(cityHotels.length)).replace("The fastest verified charger currently listed in " + cityName + " is 60 kW DC (CCS2).", `The highest confirmed output in the current listings is ${maxPower}.`)}
                   </div>
                 </details>
               ))}

@@ -5,33 +5,8 @@ import Header from "../components/Header";
 import Footer from "../components/Footer";
 import HotelCard from "../components/HotelCard";
 import { hotels, formatPrice } from "../data/hotels";
-
-const mockBookings = [
-  {
-    id: "BEVH-K7P2M1",
-    hotel: hotels[2], // Fern Jaipur
-    room: "Deluxe Room",
-    checkIn: "15 Oct 2025",
-    checkOut: "17 Oct 2025",
-    nights: 2,
-    guests: 2,
-    total: 14632,
-    status: "confirmed" as const,
-    paymentStatus: "paid",
-  },
-  {
-    id: "BEVH-A3X9QR",
-    hotel: hotels[3], // Manali
-    room: "Deluxe Cottage",
-    checkIn: "22 Nov 2025",
-    checkOut: "25 Nov 2025",
-    nights: 3,
-    guests: 2,
-    total: 22800,
-    status: "pending" as const,
-    paymentStatus: "pending",
-  },
-];
+import { useSavedHotels } from "../hooks/useSavedHotels";
+import { useBookings } from "../hooks/useBookings";
 
 const statusConfig = {
   confirmed: { label: "Confirmed", bg: "bg-success-bg", text: "text-success-text", icon: CheckCircle2 },
@@ -39,7 +14,19 @@ const statusConfig = {
   cancelled: { label: "Cancelled", bg: "bg-neutral-100", text: "text-neutral-600", icon: X },
 };
 
-function BookingCard({ booking }: { booking: typeof mockBookings[0] }) {
+type AccountBooking = {
+  id: string;
+  hotel: typeof hotels[number];
+  room: string;
+  checkIn: string;
+  checkOut: string;
+  nights: number;
+  guests: number;
+  total: number;
+  status: "confirmed";
+};
+
+function BookingCard({ booking }: { booking: AccountBooking }) {
   const status = statusConfig[booking.status];
   const StatusIcon = status.icon;
   return (
@@ -88,7 +75,25 @@ type Tab = "overview" | "bookings" | "saved";
 
 export default function AccountPage({ tab: initialTab = "overview" }: { tab?: Tab }) {
   const [tab, setTab] = useState<Tab>(initialTab);
-  const savedHotels = hotels.slice(0, 3);
+  const { savedIds } = useSavedHotels();
+  const { bookings } = useBookings();
+  const savedHotels = hotels.filter(hotel => savedIds.includes(hotel.id));
+  const accountBookings = bookings.flatMap(booking => {
+    const hotel = hotels.find(item => item.slug === booking.hotelSlug);
+    const room = hotel?.roomTypes.find(item => item.id === booking.roomId);
+    if (!hotel || !room) return [];
+    return [{
+      id: booking.id,
+      hotel,
+      room: room.name,
+      checkIn: booking.checkIn,
+      checkOut: booking.checkOut,
+      nights: Math.max(0, Math.round((new Date(booking.checkOut).getTime() - new Date(booking.checkIn).getTime()) / 86400000)),
+      guests: booking.adults + booking.children,
+      total: booking.total,
+      status: booking.status,
+    }];
+  });
 
   return (
     <div className="min-h-screen bg-neutral-50">
@@ -129,7 +134,7 @@ export default function AccountPage({ tab: initialTab = "overview" }: { tab?: Ta
             <div className="space-y-8">
               <div>
                 <h2 className="text-[20px] font-bold text-neutral-950 mb-4">Upcoming stay</h2>
-                {mockBookings.slice(0, 1).map(b => <BookingCard key={b.id} booking={b} />)}
+                {accountBookings.length ? accountBookings.slice(0, 1).map(b => <BookingCard key={b.id} booking={b} />) : <p className="text-[14px] text-neutral-600">No upcoming stays.</p>}
               </div>
               <div>
                 <div className="flex items-center justify-between mb-4">
@@ -146,9 +151,9 @@ export default function AccountPage({ tab: initialTab = "overview" }: { tab?: Ta
           {tab === "bookings" && (
             <div>
               <h2 className="text-[22px] font-bold text-neutral-950 mb-6">My bookings</h2>
-              {mockBookings.length > 0 ? (
+              {accountBookings.length > 0 ? (
                 <div className="space-y-4">
-                  {mockBookings.map(b => <BookingCard key={b.id} booking={b} />)}
+                  {accountBookings.map(b => <BookingCard key={b.id} booking={b} />)}
                 </div>
               ) : (
                 <div className="text-center py-20 bg-white rounded-2xl border border-neutral-200">

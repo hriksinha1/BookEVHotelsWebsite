@@ -76,24 +76,6 @@ export default function AboutPage() {
             ))}
           </div>
 
-          {/* Scale stats */}
-          <div className="bg-brand-950 rounded-2xl p-10 mb-20">
-            <h2 className="text-[24px] font-bold text-white mb-8">Our scale today</h2>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
-              {[
-                { value: "750+", label: "Verified hotels" },
-                { value: "250+", label: "Cities" },
-                { value: "30+", label: "States & UTs" },
-                { value: "600+", label: "Public charging" },
-              ].map(s => (
-                <div key={s.label}>
-                  <p className="text-[40px] font-bold text-brand-400 tabular-nums">{s.value}</p>
-                  <p className="text-[14px] text-neutral-400 mt-1">{s.label}</p>
-                </div>
-              ))}
-            </div>
-          </div>
-
           {/* What we record */}
           <div className="mb-20">
             <h2 className="text-[28px] font-bold text-neutral-950 mb-6">What we record for each charger</h2>
@@ -124,7 +106,7 @@ export default function AboutPage() {
           <div className="grid sm:grid-cols-2 gap-6">
             <div className="bg-brand-700 rounded-2xl p-8 text-white">
               <h3 className="text-[22px] font-bold mb-3">Find a verified stay</h3>
-              <p className="text-[15px] text-brand-100 mb-6 leading-[24px]">Browse 750+ verified EV hotels across India, with every charger confirmed before listing.</p>
+              <p className="text-[15px] text-brand-100 mb-6 leading-[24px]">Browse the current verified listings, with charger access and specifications shown before you choose a room.</p>
               <Link to="/search" className="inline-flex items-center gap-2 bg-white text-brand-700 px-5 py-3 rounded-xl text-[14px] font-semibold hover:bg-brand-50 transition-colors">
                 Explore hotels <ArrowRight size={15} />
               </Link>

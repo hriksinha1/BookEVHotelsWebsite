@@ -6,6 +6,7 @@ import Footer from "../components/Footer";
 import { Button, Heading, Input, Label, Textarea } from "../components/ui";
 import { formatPrice, getHotelBySlug } from "../data/hotels";
 import type { RoomType } from "../data/hotels";
+import { useBookings } from "../hooks/useBookings";
 
 interface GuestDetails {
   firstName: string;
@@ -203,6 +204,7 @@ export default function BookingFlowPage() {
   });
   const [processing, setProcessing] = useState(false);
   const [paymentError, setPaymentError] = useState(false);
+  const { createBooking } = useBookings();
 
   useEffect(() => {
     sessionStorage.setItem(storageKey, JSON.stringify(state));
@@ -213,7 +215,7 @@ export default function BookingFlowPage() {
   const total = room ? (room.pricePerNight + room.taxesPerNight) * nights : 0;
   const stepNumber = { rooms: 1, guest: 2, review: 3, payment: 4, confirmation: 5 }[pathStep] ?? 1;
   const hasGuest = Boolean(state.guest.firstName && state.guest.email);
-  const confirmationReference = useMemo(() => `BEVH-${hotel?.id.toUpperCase() ?? "STAY"}-${state.roomId.toUpperCase()}`, [hotel?.id, state.roomId]);
+  const confirmationReference = params.get("id") || "";
 
   if (!hotel) return <Navigate to="/search" replace />;
   if (hotel.bookingType === "partner") return <Navigate to={`/hotels/${hotel.slug}`} replace />;
@@ -226,7 +228,18 @@ export default function BookingFlowPage() {
     window.setTimeout(() => {
       setProcessing(false);
       if (params.get("failure") === "true") setPaymentError(true);
-      else navigate(`/booking/${slug}/confirmation`);
+      else {
+        const booking = createBooking({
+          hotelSlug: hotel.slug,
+          roomId: room?.id || "",
+          checkIn: state.checkIn,
+          checkOut: state.checkOut,
+          adults: state.adults,
+          children: state.children,
+          total,
+        });
+        navigate(`/booking/${slug}/confirmation?id=${booking.id}`);
+      }
     }, 900);
   };
 
@@ -288,8 +301,8 @@ export default function BookingFlowPage() {
           {pathStep === "confirmation" && room && (
             <div className="text-center">
               <CheckCircle2 size={48} className="mx-auto mb-5 text-success-fill" />
-              <Heading level={1} className="text-3xl font-bold text-neutral-950">Stay confirmed</Heading>
-              <p className="mt-2 text-base text-neutral-600">Your booking details are ready.</p>
+              <Heading level={1} className="text-3xl font-bold text-neutral-950">You're booked.</Heading>
+              <p className="mt-2 text-base text-neutral-600">Your stay details and charging plan are saved on this device.</p>
               <p className="mt-2 text-sm text-neutral-500">Reference: {confirmationReference}</p>
               <div className="mt-8 rounded-2xl border border-neutral-200 bg-white p-6 text-left">
                 <Heading level={2} className="text-lg font-semibold text-neutral-950">{hotel.name}</Heading>

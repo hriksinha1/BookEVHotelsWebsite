@@ -1,13 +1,14 @@
 import { Link } from "react-router-dom";
 import { Star, Bookmark, MapPin } from "lucide-react";
-import { useState } from "react";
 import { VerifiedBadge, AccessChip, ChargerSpecLine } from "./EVBadge";
 import type { Hotel } from "../data/hotels";
 import { formatPrice, getLowestAvailablePrice, getPrimaryCharger, hasFreeCancellation } from "../data/hotels";
 import { Button, Heading } from "./ui";
+import { useSavedHotels } from "../hooks/useSavedHotels";
 
 export default function HotelCard({ hotel, compact = false }: { hotel: Hotel; compact?: boolean }) {
-  const [saved, setSaved] = useState(false);
+  const { savedIds, toggleSaved } = useSavedHotels();
+  const saved = savedIds.includes(hotel.id);
   const primaryCharger = getPrimaryCharger(hotel);
   const availablePrice = getLowestAvailablePrice(hotel);
   const img = hotel.images[0];
@@ -50,7 +51,7 @@ export default function HotelCard({ hotel, compact = false }: { hotel: Hotel; co
           loading="lazy"
         />
         <Button
-          onClick={e => { e.preventDefault(); setSaved(!saved); }}
+          onClick={e => { e.preventDefault(); toggleSaved(hotel.id); }}
           className={`absolute top-3 right-3 w-9 h-9 rounded-full flex items-center justify-center transition-colors ${saved ? "bg-brand-700 text-white" : "bg-white/90 text-neutral-600 hover:bg-white"}`}
           aria-label={saved ? "Remove from saved" : "Save hotel"}
         >
@@ -58,7 +59,7 @@ export default function HotelCard({ hotel, compact = false }: { hotel: Hotel; co
         </Button>
         {hotel.bookingType === "partner" && (
           <span className="absolute bottom-3 left-3 rounded-full bg-white/90 px-2 py-1 text-xs font-semibold text-neutral-700">
-            Via Agoda
+            Partner booking
           </span>
         )}
       </div>
@@ -107,6 +108,9 @@ export default function HotelCard({ hotel, compact = false }: { hotel: Hotel; co
               connector={primaryCharger.connector}
               guns={primaryCharger.guns}
             />
+            <p className="text-xs font-medium text-neutral-600">
+              {primaryCharger.access} · Fee: {primaryCharger.fee}
+            </p>
           </div>
         )}
 
@@ -128,7 +132,7 @@ export default function HotelCard({ hotel, compact = false }: { hotel: Hotel; co
             to={`/hotels/${hotel.slug}`}
             className="shrink-0 whitespace-nowrap rounded-xl bg-brand-700 px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-brand-800"
           >
-            View hotel
+            {hotel.bookingType === "partner" ? "View partner stay" : "View hotel"}
           </Link>
         </div>
       </div>

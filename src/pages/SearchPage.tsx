@@ -135,6 +135,10 @@ export default function SearchPage() {
   const activeFilters = (params.get("filters") || "").split(",").filter(Boolean);
   const sort = params.get("sort") || "recommended";
   const view = params.get("view") === "map" ? "map" : "list";
+  const checkIn = params.get("checkin") || "";
+  const checkOut = params.get("checkout") || "";
+  const adults = Number(params.get("adults") || 2);
+  const rooms = Number(params.get("rooms") || 1);
   const queryKey = params.toString();
 
   useEffect(() => {
@@ -176,6 +180,18 @@ export default function SearchPage() {
         </div>
 
         <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6">
+          <div className="mb-7">
+            <Heading level={1} className="text-2xl font-bold tracking-tight text-neutral-950 sm:text-3xl">
+              {displayHotels.length} verified EV {displayHotels.length === 1 ? "stay" : "stays"}
+              {destination ? ` matching ${destination}` : ""}
+            </Heading>
+            <p className="mt-2 text-sm text-neutral-600">
+              {checkIn && checkOut
+                ? `${new Intl.DateTimeFormat("en-IN", { day: "numeric", month: "short" }).format(new Date(`${checkIn}T12:00:00`))} – ${new Intl.DateTimeFormat("en-IN", { day: "numeric", month: "short" }).format(new Date(`${checkOut}T12:00:00`))} · `
+                : "Add dates · "}
+              {adults} {adults === 1 ? "guest" : "guests"} · {rooms} {rooms === 1 ? "room" : "rooms"}
+            </p>
+          </div>
           <div className="mb-5 flex flex-wrap items-center gap-3">
             <Button
               onClick={() => setShowFilters(current => !current)}
@@ -248,7 +264,13 @@ export default function SearchPage() {
           )}
 
           {showFilters && (
-            <aside className="mb-6 rounded-2xl border border-neutral-200 bg-white p-5" aria-label="Hotel filters">
+            <aside className="fixed inset-0 z-50 overflow-y-auto bg-white p-5 md:static md:mb-6 md:rounded-2xl md:border md:border-neutral-200" aria-label="Hotel filters">
+              <div className="mb-5 flex items-center justify-between md:hidden">
+                <Heading level={2} className="text-xl font-semibold text-neutral-950">Filters</Heading>
+                <Button onClick={() => setShowFilters(false)} className="flex h-11 w-11 items-center justify-center rounded-full bg-neutral-100" aria-label="Close filters">
+                  <X size={18} />
+                </Button>
+              </div>
               <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-5">
                 {filterGroups.map(group => (
                   <fieldset key={group.label}>
@@ -268,6 +290,10 @@ export default function SearchPage() {
                     </div>
                   </fieldset>
                 ))}
+              </div>
+              <div className="sticky bottom-0 mt-6 flex gap-3 border-t border-neutral-200 bg-white py-4 md:hidden">
+                <Button onClick={() => updateParam("filters")} className="min-h-12 flex-1 rounded-xl border border-neutral-300 text-sm font-semibold text-neutral-700">Clear all</Button>
+                <Button onClick={() => setShowFilters(false)} className="min-h-12 flex-1 rounded-xl bg-brand-700 text-sm font-semibold text-white">Show {displayHotels.length} stays</Button>
               </div>
             </aside>
           )}
